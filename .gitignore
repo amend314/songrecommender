@@ -1,5 +1,7 @@
 *.zip
 *.cache
+*.npz
+*.h5
 playlistdata/**
 # Byte-compiled / optimized / DLL files
 __pycache__/
