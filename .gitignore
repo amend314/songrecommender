@@ -2,6 +2,7 @@
 *.cache
 *.npz
 *.h5
+*.png
 playlistdata/**
 # Byte-compiled / optimized / DLL files
 __pycache__/

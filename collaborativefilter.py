@@ -1,7 +1,5 @@
 import pandas as pd
 import numpy as np
-import tensorflow as tf
-import tensorflow_recommenders as tfrs
 from tensorflow import keras
 from keras.models import Sequential, Model, load_model, save_model
 from keras.layers.core import Dense, Lambda, Activation
@@ -9,7 +7,7 @@ from keras.layers import Embedding, Input, Dense, Multiply, Reshape, Flatten, Co
 from keras.regularizers import l2
 import scipy.sparse as sp
 import os
-from sklearn.model_selection import train_test_split
+import matplotlib.pyplot as plt
 
 
 csvList = []
@@ -19,7 +17,6 @@ for files in os.listdir('data'):
     csvList.append(df)
 
 df = pd.concat(csvList, axis=0, ignore_index=True)
-df = df.drop(columns=['artist_name', 'track_name'])
 df['num_holdouts'] = pd.NaT
 df['trackindex'] = df['trackid'].astype('category').cat.codes
 df.drop_duplicates()
@@ -104,9 +101,10 @@ def get_train_samples(train_mat, num_negatives):
             labels.append(0)
     return user_input, item_input, labels
 
+
 loaded = True
 verbose = 1
-epochs = 5
+epochs = 10
 batch_size = 256
 latent_dim = 8
 dense_layers = [64, 32, 16, 8]
@@ -129,6 +127,7 @@ model.compile(optimizer=keras.optimizers.Adam(learning_rate=learning_rate), loss
               metrics=['accuracy'])
 print(model.summary())
 
+
 user_input, item_input, labels = get_train_samples(train_mat, num_negatives)
 
 hist = model.fit([np.array(user_input), np.array(item_input)], np.array(labels),
@@ -136,3 +135,22 @@ hist = model.fit([np.array(user_input), np.array(item_input)], np.array(labels),
 
 model_file = '%s_NCF_%d_%s.h5' % (dataset, latent_dim, str(dense_layers))
 model.save(model_file, overwrite=True)
+
+acc = hist.history['accuracy']
+loss = hist.history['loss']
+ep = range(1, epochs)
+plt.plot(np.arange(len(acc)), acc, 'r', label='Training Accuracy')
+plt.title('Training Accuracy')
+plt.xlabel('Epochs')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.show()
+
+loss = hist.history['loss']
+ep = range(1, epochs)
+plt.plot(np.arange(len(loss)), loss, 'r', label='Training Accuracy')
+plt.title('Training Accuracy')
+plt.xlabel('Epochs')
+plt.ylabel('Accuracy')
+plt.legend()
+plt.show()

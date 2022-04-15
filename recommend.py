@@ -2,10 +2,22 @@ from keras.models import load_model
 from sklearn.cluster import KMeans
 import numpy as np
 import pandas as pd
-import collaborativefilter
+import os
+import spotifyapi
 
-df = collaborativefilter.df
-desired_user_id = 500
+csvList = []
+
+for files in os.listdir('data'):
+    df = pd.read_csv('data/' + files, sep=',', header=0)
+    csvList.append(df)
+
+df = pd.concat(csvList, axis=0, ignore_index=True)
+df = pd.concat([df, spotifyapi.buildDf()], axis=0, ignore_index=True)
+df['num_holdouts'] = pd.NaT
+df['trackindex'] = df['trackid'].astype('category').cat.codes
+df.drop_duplicates()
+
+desired_user_id = 99999
 model_path = 'spotify_NCF_8_[64, 32, 16, 8].h5'
 print('using model: %s' % model_path)
 model = load_model(model_path)
@@ -53,4 +65,4 @@ for i, prob in enumerate(results):
     results_df.loc[i] = [prob[0], df[df['trackindex'] == i].iloc[0]['track_name'], df[df['trackindex'] == i].iloc[0]['artist_name']]
 results_df = results_df.sort_values(by=['probability'], ascending=False)
 
-results_df.head(20)
+print(results_df.head(20))
