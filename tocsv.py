@@ -6,7 +6,7 @@ import json
 def jsonToCSV():
     start = 0
     end = 1000
-    while end != 5000:
+    while end != 11000:
         songPlaylistArray = []
         path = 'playlistdata/mpd.slice.' + str(start) + "-" + str(end-1) + '.json'
         d = json.load(open(path, 'r'))

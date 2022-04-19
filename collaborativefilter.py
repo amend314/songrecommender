@@ -36,7 +36,6 @@ def get_model(num_users, num_items, latent_dim=8, dense_layers=[64, 32, 16, 8],
     input_user = Input(shape=(1,), dtype='int32', name='user_input')
     input_item = Input(shape=(1,), dtype='int32', name='item_input')
 
-    # embedding layer
     mf_user_embedding = Embedding(input_dim=num_users, output_dim=latent_dim,
                                   name='mf_user_embedding',
                                   embeddings_initializer='RandomNormal',
@@ -56,19 +55,16 @@ def get_model(num_users, num_items, latent_dim=8, dense_layers=[64, 32, 16, 8],
                                    embeddings_regularizer=l2(reg_layers[0]),
                                    input_length=1)
 
-    # MF latent vector
     mf_user_latent = Flatten()(mf_user_embedding(input_user))
     mf_item_latent = Flatten()(mf_item_embedding(input_item))
     mf_cat_latent = Multiply()([mf_user_latent, mf_item_latent])
 
-    # MLP latent vector
     mlp_user_latent = Flatten()(mlp_user_embedding(input_user))
     mlp_item_latent = Flatten()(mlp_item_embedding(input_item))
     mlp_cat_latent = Concatenate()([mlp_user_latent, mlp_item_latent])
 
     mlp_vector = mlp_cat_latent
 
-    # build dense layer for model
     for i in range(1, len(dense_layers)):
         layer = Dense(dense_layers[i],
                       activity_regularizer=l2(reg_layers[i]),
@@ -92,7 +88,7 @@ def get_train_samples(train_mat, num_negatives):
         item_input.append(i)
         labels.append(1)
 
-        for t in range (num_negatives):
+        for t in range(num_negatives):
             j = np.random.randint(num_item)
             while(u, j) in train_mat.keys():
                 j = np.random.randint(num_item)
@@ -139,8 +135,8 @@ model.save(model_file, overwrite=True)
 acc = hist.history['accuracy']
 loss = hist.history['loss']
 ep = range(1, epochs)
-plt.plot(np.arange(len(acc)), acc, 'r', label='Training Accuracy')
-plt.title('Training Accuracy')
+plt.plot(np.arange(len(acc)), acc, 'r', label='Accuracy')
+plt.title('Accuracy')
 plt.xlabel('Epochs')
 plt.ylabel('Accuracy')
 plt.legend()
@@ -148,9 +144,9 @@ plt.show()
 
 loss = hist.history['loss']
 ep = range(1, epochs)
-plt.plot(np.arange(len(loss)), loss, 'r', label='Training Accuracy')
-plt.title('Training Accuracy')
+plt.plot(np.arange(len(loss)), loss, 'b', label='Loss')
+plt.title('Loss')
 plt.xlabel('Epochs')
-plt.ylabel('Accuracy')
+plt.ylabel('Loss')
 plt.legend()
 plt.show()

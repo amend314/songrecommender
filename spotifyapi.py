@@ -4,18 +4,30 @@ from spotipy.oauth2 import SpotifyOAuth
 import credentials
 import pandas as pd
 
-scope = "user-top-read"
+scope = "playlist-modify-public"
 
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(client_id=credentials.client_id,
                                                client_secret=credentials.client_secret,
                                                scope=scope, redirect_uri='http://localhost:8888/callback'))
 
-playlists = sp.current_user_playlists()
-playlist_id = (playlists['items'][0]['id'])
+
+def getUsername():
+    username = input("Enter Spotify Username: ")
+    playlists = sp.user_playlists(username)
+
+    for x, y in zip(playlists['items'], range(len(playlists['items']))):
+        print(y, "-", x['name'])
+
+    playlistNum = input("Select the playlist number: ")
+
+    return playlists, playlistNum
+
+
+playlists, playlistNum = getUsername()
+playlist_id = (playlists['items'][int(playlistNum)]['id'])
 
 
 def getTrackId():
-
     song_id = []
 
     p_songs = sp.playlist(playlist_id, additional_types=('track',))
@@ -30,7 +42,6 @@ def getTrackId():
 
 
 def getTrackName():
-
     tracks = []
     songs = sp.playlist(playlist_id, additional_types=('track', ))['tracks']['items']
 
@@ -41,12 +52,13 @@ def getTrackName():
 
 
 def getArtistName():
-
     artist = []
     songs = sp.playlist(playlist_id, additional_types=('track', ))['tracks']['items']
 
     for x in songs:
         i = (x['track']['artists'])
+        if len(i) > 1:
+            i = i[0:1]
         for y in i:
             artist.append(y['name'])
 
@@ -63,3 +75,7 @@ def buildDf():
     df2.drop_duplicates()
 
     return df2
+
+
+def addSongs(songList):
+    sp.playlist_add_items(playlist_id=playlist_id, items=songList)
