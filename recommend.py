@@ -21,7 +21,6 @@ desired_user_id = 99999
 model_path = 'spotify_NCF_8_[64, 32, 16, 8].h5'
 print('using model: %s' % model_path)
 model = load_model(model_path)
-print('Loaded model!')
 
 mlp_user_embedding_weights = (next(iter(filter(lambda x: x.name == 'mlp_user_embedding', model.layers))).get_weights())
 
@@ -63,8 +62,8 @@ for i, prob in enumerate(results):
     results_df.loc[i] = [prob[0], df[df['trackindex'] == i].iloc[0]['trackid'], df[df['trackindex'] == i].iloc[0]['track_name'], df[df['trackindex'] == i].iloc[0]['artist_name']]
 results_df = results_df.sort_values(by=['probability'], ascending=False)
 
-print(results_df.head(20))
+print(results_df.head(10))
 add_songs = results_df['trackid'].tolist()
-print(df['track_name'], df['artist_name'])
-spotifyapi.addSongs(add_songs[0:5])
+print(results_df['track_name'].head(10))
+spotifyapi.addSongs(add_songs[0:10])
 

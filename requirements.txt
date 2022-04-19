@@ -3,3 +3,8 @@ pandas==1.4.1
 scikit_learn==1.0.2
 spotipy==2.19.0
 tensorflow==2.8.0
+keras~=2.8.0
+sklearn~=0.0
+scikit-learn~=1.0.2
+scipy~=1.5.4
+matplotlib~=3.3.3

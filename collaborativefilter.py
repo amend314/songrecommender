@@ -100,7 +100,7 @@ def get_train_samples(train_mat, num_negatives):
 
 loaded = True
 verbose = 1
-epochs = 10
+epochs = 4
 batch_size = 256
 latent_dim = 8
 dense_layers = [64, 32, 16, 8]
